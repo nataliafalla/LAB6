@@ -17,23 +17,29 @@ Aplicación web con perfil de administrador para gestión de usuarios (CRUD) des
 11. [Paso 7: Subir el código a EC2](#paso-7-subir-el-código-a-ec2)
 12. [Paso 8: Configurar el archivo .env](#paso-8-configurar-el-archivo-env)
 13. [Paso 9: Construir y arrancar el contenedor](#paso-9-construir-y-arrancar-el-contenedor)
-14. [Pruebas funcionales](#pruebas-funcionales)
-15. [Buenas prácticas de seguridad aplicadas](#buenas-prácticas-de-seguridad-aplicadas)
-16. [Evidencias requeridas](#evidencias-requeridas)
-17. [Troubleshooting](#troubleshooting)
-18. [Limpiar recursos](#limpiar-recursos)
+14. [Imagen Docker en Docker Hub](#imagen-docker-en-docker-hub)
+15. [Pruebas funcionales](#pruebas-funcionales)
+16. [Buenas prácticas de seguridad aplicadas](#buenas-prácticas-de-seguridad-aplicadas)
+17. [Evidencias requeridas](#evidencias-requeridas)
+18. [Troubleshooting](#troubleshooting)
+19. [Limpiar recursos](#limpiar-recursos)
 
 ---
 
 ## Arquitectura
 
 ```
-                    ┌──────────────────┐
-                    │   Navegador      │
-                    │   (Admin)        │
-                    └────────┬─────────┘
-                             │ HTTP (puerto 80)
-                             ▼
+        ┌────────────────────┐
+        │   Docker Hub       │
+        │  imagen publicada  │──── docker pull ──┐
+        └────────────────────┘                   │
+                                                 │
+                    ┌──────────────────┐         │
+                    │   Navegador      │         │
+                    │   (Admin)        │         │
+                    └────────┬─────────┘         │
+                             │ HTTP (puerto 80)  │
+                             ▼                   ▼
         ┌────────────────────────────────────────┐
         │   EC2 t2.micro (Amazon Linux 2023)     │
         │   ┌──────────────────────────────┐     │
@@ -406,6 +412,46 @@ Abre en el navegador: `http://<IP-PUBLICA-EC2>` y verás la pantalla de login.
 
 ---
 
+## Imagen Docker en Docker Hub
+
+La imagen del proyecto está publicada en Docker Hub, lo que permite desplegarla en cualquier servidor sin necesidad de construirla localmente.
+
+**Repositorio:** `https://hub.docker.com/r/TU-USUARIO-DOCKERHUB/admin-panel-aws-lab`
+
+### Despliegue rápido desde Docker Hub
+
+En lugar de hacer `docker build` (Paso 9), puedes descargar la imagen ya construida:
+
+```bash
+# Descargar la imagen desde Docker Hub
+docker pull TU-USUARIO-DOCKERHUB/admin-panel-aws-lab:latest
+
+# Arrancar el contenedor (requiere .env configurado, ver Paso 8)
+docker run -d \
+  --name admin-panel \
+  --restart unless-stopped \
+  -p 80:5000 \
+  --env-file .env \
+  TU-USUARIO-DOCKERHUB/admin-panel-aws-lab:latest
+```
+
+### Cómo se publicó la imagen
+
+```bash
+# 1. Login en Docker Hub (pide usuario y contraseña/token)
+docker login
+
+# 2. Etiquetar la imagen local con el formato usuario/repo:tag
+docker tag admin-panel TU-USUARIO-DOCKERHUB/admin-panel-aws-lab:latest
+
+# 3. Subir la imagen
+docker push TU-USUARIO-DOCKERHUB/admin-panel-aws-lab:latest
+```
+
+📸 **Evidencia:** `17_DockerHub_imagen.png` mostrando el repositorio en Docker Hub con la imagen publicada.
+
+---
+
 ## Pruebas funcionales
 
 1. **Login:** entra con las credenciales de `ADMIN_USER` / `ADMIN_PASSWORD`.
@@ -480,8 +526,12 @@ Combinado con la consola de S3 abierta en `profiles/`, se ve cómo los registros
 ### Base de datos
 - [ ] `16_DB_query_users.png` — consulta a la tabla `users` mostrando registros.
 
+### Docker Hub
+- [ ] `17_DockerHub_imagen.png` — repositorio en Docker Hub con la imagen publicada.
+
 ### Entregables finales
-- [ ] URL del **repositorio Git público**.
+- [ ] URL del **repositorio Git público** (GitHub).
+- [ ] URL del **repositorio Docker Hub**.
 - [ ] **Video de demostración** mostrando CRUD reflejándose en AWS en tiempo real.
 - [ ] Este **README.md** como documentación técnica.
 
