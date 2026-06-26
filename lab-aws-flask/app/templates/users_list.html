@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<div class="header-row">
+  <h1>Gestión de Usuarios</h1>
+  <a href="{{ url_for('users.create_user') }}" class="btn btn-primary">+ Nuevo usuario</a>
+</div>
+
+<form method="GET" class="search-form">
+  <input type="text" name="q" placeholder="Buscar por nombre o email..." value="{{ q }}">
+  <button type="submit" class="btn">Buscar</button>
+</form>
+
+<table class="users-table">
+  <thead>
+    <tr>
+      <th>Foto</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Rol</th><th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>
+        {% if u.image_url %}
+          <img src="{{ u.image_url }}" alt="" class="avatar">
+        {% else %}
+          <div class="avatar avatar-placeholder">{{ u.full_name[0]|upper }}</div>
+        {% endif %}
+      </td>
+      <td>{{ u.full_name }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.phone or '-' }}</td>
+      <td><span class="badge">{{ u.role }}</span></td>
+      <td class="actions">
+        <a href="{{ url_for('users.edit_user', user_id=u.id) }}" class="btn btn-sm">Editar</a>
+        <form method="POST" action="{{ url_for('users.delete_user', user_id=u.id) }}" style="display:inline" onsubmit="return confirm('¿Eliminar a {{ u.full_name }}?');">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="empty">No hay usuarios registrados.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

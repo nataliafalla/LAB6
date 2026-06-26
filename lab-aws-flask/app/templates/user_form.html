@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if user else 'Nuevo' }} Usuario{% endblock %}
+{% block content %}
+<h1>{{ 'Editar' if user else 'Nuevo' }} Usuario</h1>
+
+<form method="POST" enctype="multipart/form-data" class="user-form">
+  <label>Nombre completo *</label>
+  <input type="text" name="full_name" value="{{ user.full_name if user else '' }}" required>
+
+  <label>Email *</label>
+  <input type="email" name="email" value="{{ user.email if user else '' }}" required>
+
+  <label>Teléfono</label>
+  <input type="text" name="phone" value="{{ user.phone if user else '' }}">
+
+  <label>Rol</label>
+  <select name="role">
+    <option value="user" {{ 'selected' if user and user.role == 'user' else '' }}>Usuario</option>
+    <option value="editor" {{ 'selected' if user and user.role == 'editor' else '' }}>Editor</option>
+    <option value="admin" {{ 'selected' if user and user.role == 'admin' else '' }}>Admin</option>
+  </select>
+
+  <label>Imagen de perfil (PNG/JPG/WEBP, máx 5MB)</label>
+  <input type="file" name="image" accept="image/*">
+
+  {% if user and user.image_url %}
+  <div class="current-image">
+    <p>Imagen actual:</p>
+    <img src="{{ user.image_url }}" class="avatar avatar-lg" alt="">
+  </div>
+  {% endif %}
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">{{ 'Actualizar' if user else 'Crear' }}</button>
+    <a href="{{ url_for('users.list_users') }}" class="btn">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
